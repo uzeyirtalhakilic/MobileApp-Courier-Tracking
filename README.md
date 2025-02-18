@@ -31,7 +31,7 @@ This project is a **mobile application** developed using **React Native**. It wo
 4. Configure the Data Folder
 In the Data folder, open the configuration file and modify the IP field to use your own server IP address.
 
-5. Navigate to the mobileapp folder from [MobileApp](https://github.com/uzeyirtalhakilic/MobileApp-Courier-Tracking):
+5. Navigate to the server folder :
     Start the server by running the following commands
      ```bash
       cd server
