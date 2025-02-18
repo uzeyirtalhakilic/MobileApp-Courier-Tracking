@@ -27,7 +27,17 @@ This project is a **mobile application** developed using **React Native**. It wo
    ```bash
    npm install
    ```
-4. Start the application:
+
+4. Configure the Data Folder
+In the Data folder, open the configuration file and modify the IP field to use your own server IP address.
+
+5. Navigate to the mobileapp folder from [MobileApp](https://github.com/uzeyirtalhakilic/MobileApp-Courier-Tracking):
+    Start the server by running the following commands
+     ```bash
+      cd server
+      node index
+     ```
+6. Start the application:
    ```bash
    npx react-native run-android   # For Android
    npx react-native run-ios       # For iOS (MacOS required)
