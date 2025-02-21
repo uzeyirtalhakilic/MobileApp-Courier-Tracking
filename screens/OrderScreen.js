@@ -3,14 +3,13 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native
 import { useNavigation } from '@react-navigation/native';
 import { ThemeContext } from '../contexts/ThemeContext';
 
-//TODO Dosyadan Çekilecek
+//TODO veritabanından çek Çekilecek
 const mockOrders = [
   { id: '1', restaurant: 'PizzaPort', customer: 'Üzeyir Talha Kılıç', status: 'Aktif Sipariş', date: '11.07.2024' },
-  { id: '2', restaurant: 'Burger King', customer: 'Yusuf Mehel', status: 'Teslim Edildi', date: '2024-07-02' },
-  { id: '3', restaurant: 'Dominos', customer: 'Üzeyir TK', status: 'Teslim Edildi', date: '2024-07-03' },
-  { id: '4', restaurant: 'PizzaPort', customer: 'Üzeyir Talha Kılıç', status: 'Teslim Edildi', date: '11.07.2024' },
-  { id: '5', restaurant: 'Burger King', customer: 'Yusuf Mehel', status: 'Teslim Edildi', date: '2024-07-02' },
-  { id: '6', restaurant: 'Dominos', customer: 'Üzeyir TK', status: 'Teslim Edildi', date: '2024-07-03' },
+  { id: '2', restaurant: 'Burger King', customer: 'Üzeyir', status: 'Aktif Sipariş', date: '2024-07-02' },
+  { id: '3', restaurant: 'Dominos', customer: 'Talha', status: 'Teslim Edildi', date: '2024-07-03' },
+  { id: '4', restaurant: 'PizzaPort', customer: 'Kılıç', status: 'Teslim Edildi', date: '11.07.2024' },
+
 ];
 
 const OrderScreen = () => {

@@ -1,22 +1,19 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
-import { Platform, StyleSheet, View, Text, TouchableOpacity, Linking, Image, Switch, Alert, BackHandler, FlatList, Modal } from 'react-native';
-import MapView, { PROVIDER_DEFAULT, Marker } from 'react-native-maps';
+import { Platform, StyleSheet, View, Text, TouchableOpacity, Linking, Alert, BackHandler, FlatList, Modal } from 'react-native';
 import * as Location from 'expo-location';
-import MapViewDirections from 'react-native-maps-directions';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { MapStyle, MapStyleIOS } from '../contexts/MapStyle';
 import Icon from 'react-native-vector-icons/Ionicons';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { AuthContext } from '../contexts/AuthContext';
 import MapComponent from '../components/MapComponent';
 import { useWebSocket } from '../contexts/WebSocketProvider';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const HomeScreen = ({ navigation }) => {
   const { isDarkMode, headerColor } = useContext(ThemeContext);
   const { sendLocation } = useWebSocket();
   const [isEnabled, setIsEnabled] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [orderPicked, setOrderPicked] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -24,14 +21,16 @@ const HomeScreen = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const [restaurant, setRestaurant] = useState([]);
   const [isOnWay, setIsOnWay] = useState(false);
+  const [orders, setOrders] = useState([]);
 
-  const activeOrders = user.orders.filter(order => order.status === "Aktif Sipariş");
+
+  const activeOrders = user.orders.filter(order => order.status === 'Aktif Sipariş');
 
     // Tüm kuryeleri API'dan yükle
-    const loadRestaurants = async () => {
+    const loadRestaurantsAndOrders = async () => {
       try {
         setRestaurant(user.restaurantID);
-
+        setOrders(user.orders)
       } catch (error) {
         console.error("Restoranları yükleme hatası:", error);
       }
@@ -63,7 +62,7 @@ const HomeScreen = ({ navigation }) => {
 
     useEffect(() => {
       const initializeData = async () => {
-        await loadRestaurants(); // Tüm kuryeleri yükle
+        await loadRestaurantsAndOrders(); // Tüm kuryeleri yükle
       };
       initializeData();
     }, []);
@@ -148,7 +147,6 @@ const HomeScreen = ({ navigation }) => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.log('Permission denied');
         return;
       }
 
@@ -210,7 +208,7 @@ const HomeScreen = ({ navigation }) => {
 
   // initializeData fonksiyonunu sayfa yenilemek için kullanıyoruz
   const initializeData = async () => {
-    await loadRestaurants();
+    await loadRestaurantsAndOrders();
   };
 
   const openDirections = (restaurantLocation, customerLocations) => {
@@ -231,23 +229,18 @@ const HomeScreen = ({ navigation }) => {
 
   // Bottom Sheet referansı
   const bottomSheetRef = useRef(null);
-
+    // callbacks
+    const handleSheetChanges = useCallback((index) => {
+      console.log('handleSheetChanges', index);
+    }, []);
   // Snap Point'leri belirleyin
   const snapPoints = ['25%', '60%', '90%'];
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#333' : '#fff' }]}>
-      <View style={styles.switchWrapper}>
-        <Text style={[styles.switchText, { color: isDarkMode ? '#fff' : 'darkblue' }]}>Harita Gece Modu</Text>
-        <Switch
-          trackColor={{ false: 'grey', true: 'darkblue' }}
-          thumbColor={isEnabled ? 'white' : 'darkblue'}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={!isEnabled}
-        />
-      </View>
 
+
+      <GestureHandlerRootView style={styles.container}>
       {currentLocation && (
         <MapComponent
           currentLocation={currentLocation}
@@ -256,16 +249,14 @@ const HomeScreen = ({ navigation }) => {
           isEnabled={isEnabled}
         />
       )}
-
       <BottomSheet
         ref={bottomSheetRef}
-        index={0}
+        index={0} 
         snapPoints={snapPoints}
-        handleHeight={50}
+        animateOnMount={true} 
         backgroundStyle={{ backgroundColor: isDarkMode ? '#333' : '#fff' }}
-        onChange={() => setOrderPicked(false)}
-        scrollEnabled={true}
       >
+        <BottomSheetView style={styles.contentContainer}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, { backgroundColor: '#03a9fc' }]}
@@ -304,52 +295,18 @@ const HomeScreen = ({ navigation }) => {
             <Text style={[styles.previousOrdersButtonText, { color: isDarkMode ? '#fff' : '#000' }]}>Önceki Siparişler</Text>
           </TouchableOpacity>
         </View>
-        <View style={[styles.flatListContainer, { maxHeight: '60%' }]}>
+        </BottomSheetView>
+        <View style={[styles.flatListContainer]}>
           <FlatList
-            data={activeOrders}
-            renderItem={renderItem}
+            data={orders}
             keyExtractor={(item) => item._id}
-            contentContainerStyle={{ flexGrow: 1, paddingBottom: 80 }}
+            renderItem={renderItem}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 0 }}
             scrollEnabled={true}
           />
         </View>
-        <TouchableOpacity
-          disabled={isDisabled}
-          onPress={handlePress}
-          style={[styles.breakButton, { backgroundColor: isDisabled ? '#B0B0B0' : '#C62828' }]}
-        >
-          <Text style={styles.buttonText}>Mola</Text>
-          {isDisabled && (
-            <Text style={[styles.buttonText, { color: '#fff', fontSize: 20 }]}>{formatTime(timeLeft)}</Text>
-          )}
-        </TouchableOpacity>
-
-        <Modal
-          visible={isBreakModalVisible}
-          transparent
-          animationType="slide"
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setIsBreakModalVisible(!isBreakModalVisible);
-          }}
-        >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Mola Süresi: {formatTime(timeLeft)}</Text>
-            <TouchableOpacity
-              style={styles.closeModalButton}
-              onPress={() => {
-                setIsBreakModalVisible(false);
-                setIsDisabled(false);
-              }}
-            >
-              <Text style={styles.closeModalText}>Mola Bitir</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        </Modal>
       </BottomSheet>
-
+      </GestureHandlerRootView>
 
     </View>
   );
@@ -388,18 +345,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  switchWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginVertical: 10,
-    paddingHorizontal: 10,
-    flex: 0.04,
-  },
-  switchText: {
     fontSize: 16,
     fontWeight: 'bold',
   },

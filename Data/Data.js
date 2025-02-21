@@ -1,4 +1,4 @@
-export const ip = '192.168.62.5';
+export const ip = '192.168.1.133';
 export const API_URL = `http://${ip}:3000`; // API URL de ip değişkenini kullanıyor
 
 // Restoran fonksiyonları

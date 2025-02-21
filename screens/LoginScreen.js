@@ -35,7 +35,7 @@ const LoginScreen = () => {
 
   return (
     <LinearGradient
-      colors={['#354767', '#356755']}
+      colors={['darkorange', 'darkred']}
       style={styles.container}>
       <View style={styles.headerContainer}>
         <Image
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: 20,
-    backgroundColor: '#D2A07A',
+    backgroundColor: 'darkorange',
   },
   passwordContainer: {
     flexDirection: 'row',
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     width: '100%',
-    height: 100,
+    height: 120,
     resizeMode: 'contain',
     alignSelf: 'center',
     marginBottom: 20,

@@ -50,7 +50,7 @@ const OptionsScreen = () => {
       >
         <Text style={[styles.logoutButtonText, { color: isDarkMode ? '#fff' : '#000' }]}>Log Out</Text>
       </TouchableOpacity>
-      <Text style={[styles.optionText, { color: isDarkMode ? '#fff' : '#333' }]}>Mehel Ar-Ge ve Otomasyon</Text>
+      <Text style={[styles.optionText, { color: isDarkMode ? '#fff' : '#333' }]}>Üzeyir Talha Kılıç</Text>
     </View>
   );
 };

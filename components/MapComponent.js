@@ -3,7 +3,6 @@ import { Platform, Image, StyleSheet } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { MapStyle, MapStyleIOS } from '../contexts/MapStyle';
 
 const OPENROUTESERVICE_APIKEY = '5b3ce3597851110001cf6248f70fa3413a8041af951c0837fb0bdf6e'; // OpenRouteService API anahtarınızı buraya ekleyin
 
@@ -21,7 +20,6 @@ const MapComponent = ({
   // const [restaurantRouteCoordinates, setRestaurantRouteCoordinates] = useState([]);
   // const [customerRoutesCoordinates, setCustomerRoutesCoordinates] = useState([]);
 
-  const mapStyle = Platform.OS === 'ios' && !isEnabled ? MapStyleIOS : isEnabled ? [] : MapStyle;
 
 const routeCache = new Map();
 
@@ -103,14 +101,13 @@ const fetchRoute = async (origin, destination) => {
 
   return (
     <MapView
-      customMapStyle={mapStyle}
       provider={MapView.PROVIDER_OSM}
       style={styles.map}
       initialRegion={{
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
-        latitudeDelta: 0.0322,
-        longitudeDelta: 0.0221,
+        latitudeDelta: 0.2,
+        longitudeDelta: 0.1,
       }}
     >
       {markers.map((marker, index) => (
